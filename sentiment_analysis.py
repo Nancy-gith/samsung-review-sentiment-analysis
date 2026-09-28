@@ -1,7 +1,7 @@
 """
 Samsung Galaxy Consumer Review Sentiment & Theme Analysis
 ------------------------------------------------------------
-Analyzes ~8,000 real Samsung Galaxy customer reviews (Amazon.in) to surface
+Analyzes 492 unique Samsung Galaxy customer reviews (Amazon.in) to surface
 sentiment distribution and the specific product/service themes driving it.
 
 Data source: msiddhu/sentiment-analysis_on_phone-reviews (public GitHub dataset,
@@ -25,7 +25,7 @@ STOPWORDS = set(
     """the a an is are was were be been being to of and or for with in on at by from this that these those
     it its i you your he she they we our my me him her them us as but if so not no very just really also too much more
     phone mobile product samsung galaxy get got have has had do does did will would can could all one good bad
-    amazon dont even like use using time back""".split()
+    amazon even like use using time back""".split()
 )
 
 LOGISTICS_TERMS = ["return", "replacement", "delivery", "seller", "refund", "days", "received"]
@@ -39,6 +39,9 @@ def load_and_clean(path: str) -> pd.DataFrame:
         samsung["body"].astype(str).str.replace("\n", " ", regex=False).str.strip()
     )
     samsung = samsung[samsung["body_clean"].str.len() > 10]
+    # Amazon shows the same reviews on every colour/RAM variant of a phone, so
+    # the scraped data repeats each review several times. Keep one copy of each.
+    samsung = samsung.drop_duplicates(subset="body")
     return samsung
 
 
@@ -88,8 +91,9 @@ def plot_summary(df: pd.DataFrame, pos_themes: dict, neg_themes: dict, out_path:
     axes[0].set_title(f"Samsung Galaxy Review Sentiment\n(n={len(df):,} Amazon.in reviews)",
                        fontsize=12, fontweight="bold")
     axes[0].set_ylabel("Number of Reviews")
+    axes[0].set_ylim(0, counts.max() * 1.18)
     for i, v in enumerate(counts.values):
-        axes[0].text(i, v + 50, f"{v}\n({v / counts.sum() * 100:.1f}%)", ha="center", fontsize=10)
+        axes[0].text(i, v + counts.max() * 0.02, f"{v}\n({v / counts.sum() * 100:.1f}%)", ha="center", fontsize=10)
 
     labels = [f"{k} (pos)" for k in pos_themes] + [f"{k} (neg)" for k in neg_themes]
     values = list(pos_themes.values()) + list(neg_themes.values())

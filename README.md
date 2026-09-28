@@ -1,6 +1,6 @@
 # Samsung Galaxy Consumer Review Sentiment & Theme Analysis
 
-Analysis of **7,913 real Samsung Galaxy customer reviews** scraped from Amazon.in, uncovering
+Analysis of **492 unique Samsung Galaxy customer reviews** from Amazon.in, uncovering
 what actually drives positive vs. negative sentiment — beyond a simple polarity score.
 
 ![Sentiment Analysis Chart](samsung_sentiment_analysis.png)
@@ -13,12 +13,13 @@ the way a Consumer Insights analyst would frame it for a product or marketing te
 
 ## Key Findings
 
-- Sentiment is nearly split: **44% positive vs. 46.4% negative** — a polarized customer base,
+- Sentiment is nearly split: **46% positive vs. 45% negative** — a polarized customer base,
   not uniform satisfaction.
-- **Camera quality** and **battery life** are the most-discussed features in *both* positive and
+- **Camera quality** and **battery** are among the most-discussed features in *both* positive and
   negative reviews — they're the biggest expectation-setters, not universally loved or hated.
-- **51% of negative reviews** mention return, replacement, or delivery language — a meaningful
-  share of dissatisfaction is about the post-purchase experience, not the device itself.
+- **~49% of negative reviews** mention return, replacement, refund or delivery language — a meaningful
+  share of dissatisfaction is tied to the post-purchase experience, not only the device itself.
+  (This is a keyword match, so it's a rough signal: e.g. "received a defective phone" also counts.)
 - "Heating issue" and "customer care" are distinct, recurring complaint clusters specific enough
   to route to product and support teams respectively.
 
@@ -36,11 +37,20 @@ Since star ratings were available as reliable ground truth, sentiment was reassi
 rating directly (1-2★ Negative, 3★ Neutral, 4-5★ Positive), and text mining (bigram frequency)
 was used separately to explain *why* — which is arguably a better-designed approach regardless.
 
+## Data-quality fix: duplicate reviews
+
+A later review of the data found that the raw Samsung subset had **7,913 rows but only 492 unique
+review texts** (~94% duplicates). Amazon shows the same reviews on every colour/RAM variant of a
+phone, so the scraper collected each review several times. The pipeline now removes duplicates
+(`drop_duplicates(subset="body")`) before any analysis. The headline findings held up: the
+sentiment split moved from 44/46 to 46/45 and the main themes stayed the same.
+
 ## Data
 
 - **Source:** [msiddhu/sentiment-analysis_on_phone-reviews](https://github.com/msiddhu/sentiment-analysis_on_phone-reviews)
   (public dataset, reviews scraped from Amazon.in)
-- **Scope:** Filtered to Samsung Galaxy models only — 7,913 reviews across 10 models
+- **Scope:** Filtered to Samsung Galaxy models only — 492 unique reviews across 6 models
+  (Galaxy M01, M01 Core, M21, M31, M31s, Z Flip)
 
 ## Tech Stack
 
